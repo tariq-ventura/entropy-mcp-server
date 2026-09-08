@@ -1,12 +1,17 @@
 package domain
 
 type SearchRequestsInput struct {
-	Query         string        `json:"query,omitempty" jsonschema:"Texto relacionado con el proyecto, ubicación o tipo de maquinaria"`
-	Statuses      []string      `json:"statuses,omitempty" jsonschema:"Estados que deben incluirse"`
-	EquipmentType string        `json:"equipmentType,omitempty" jsonschema:"Tipo de maquinaria"`
-	Near          *NearLocation `json:"near,omitempty" jsonschema:"Ubicación y radio para la búsqueda geográfica"`
-	Page          int           `json:"page,omitempty" jsonschema:"Página solicitada"`
-	PageSize      int           `json:"pageSize,omitempty" jsonschema:"Resultados por página, máximo 100"`
+	Query         string   `json:"query,omitempty" jsonschema:"Búsqueda literal por proyecto, ubicación o tipo"`
+	SemanticQuery string   `json:"semanticQuery,omitempty" jsonschema:"Descripción en lenguaje natural de las solicitudes buscadas"`
+	Statuses      []string `json:"statuses,omitempty" jsonschema:"Estados permitidos"`
+	EquipmentType string   `json:"equipmentType,omitempty" jsonschema:"Tipo exacto de maquinaria"`
+
+	Near *NearLocation `json:"near,omitempty"`
+
+	MinSemanticScore *float64 `json:"minSemanticScore,omitempty" jsonschema:"Similitud mínima entre 0 y 1"`
+
+	Page     int `json:"page,omitempty"`
+	PageSize int `json:"pageSize,omitempty"`
 }
 
 type NearLocation struct {
