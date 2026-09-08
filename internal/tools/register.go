@@ -72,4 +72,18 @@ func (t *Tools) Register(server *mcp.Server) {
 		},
 		t.CancelAssignment,
 	)
+
+	mcp.AddTool(
+		server,
+		&mcp.Tool{
+			Name: "search_logistics_requests",
+			Description: "Busca solicitudes logísticas por texto, estado, " +
+				"tipo de maquinaria y cercanía geográfica. " +
+				"Utiliza coordenadas resueltas previamente cuando el usuario " +
+				"solicite búsquedas cerca de una ubicación. " +
+				"Los UUID devueltos deben utilizarse internamente y no " +
+				"mostrarse salvo que el usuario los solicite.",
+		},
+		t.SearchLogisticsRequests,
+	)
 }
