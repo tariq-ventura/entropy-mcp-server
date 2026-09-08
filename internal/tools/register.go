@@ -1,6 +1,8 @@
 package tools
 
-import "github.com/modelcontextprotocol/go-sdk/mcp"
+import (
+	"github.com/modelcontextprotocol/go-sdk/mcp"
+)
 
 func (t *Tools) Register(server *mcp.Server) {
 	mcp.AddTool(
@@ -9,7 +11,8 @@ func (t *Tools) Register(server *mcp.Server) {
 			Name: "create_logistics_request",
 			Description: "Crea una solicitud logística PENDING. " +
 				"Utiliza esta herramienta después de extraer y confirmar " +
-				"tipo de maquinaria, proyecto, ubicación y fechas.",
+				"tipo de maquinaria, proyecto, ubicación, descripción, " +
+				"requerimientos y fechas.",
 		},
 		t.CreateLogisticsRequest,
 	)
@@ -77,12 +80,16 @@ func (t *Tools) Register(server *mcp.Server) {
 		server,
 		&mcp.Tool{
 			Name: "search_logistics_requests",
-			Description: "Busca solicitudes logísticas por texto, estado, " +
-				"tipo de maquinaria y cercanía geográfica. " +
-				"Utiliza coordenadas resueltas previamente cuando el usuario " +
-				"solicite búsquedas cerca de una ubicación. " +
-				"Los UUID devueltos deben utilizarse internamente y no " +
-				"mostrarse salvo que el usuario los solicite.",
+			Description: `
+				Busca solicitudes logísticas usando texto literal, significado semántico,
+				estado, tipo de maquinaria y proximidad geográfica.
+
+				Usa semanticQuery cuando el usuario describa una necesidad o concepto.
+				Usa query cuando proporcione el nombre exacto de un proyecto.
+				Usa near cuando solicite resultados cerca de una ciudad o dirección.
+				No inventes coordenadas: deben venir de Google Maps.
+			`,
+			InputSchema: searchLogisticsRequestsInputSchema(),
 		},
 		t.SearchLogisticsRequests,
 	)
