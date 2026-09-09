@@ -7,8 +7,6 @@ import (
 	"github.com/tariq-ventura/entropy-mcp-server/internal/domain"
 )
 
-const httpMethodQuery = "QUERY"
-
 func (c *Client) SearchRequests(
 	ctx context.Context,
 	input domain.SearchRequestsInput,
