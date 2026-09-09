@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/tariq-ventura/entropy-mcp-server/internal/domain"
 )
@@ -16,8 +17,8 @@ func (c *Client) SearchRequests(
 
 	if err := c.do(
 		ctx,
-		httpMethodQuery,
-		"/api/v1/requests",
+		http.MethodPost,
+		"/api/v1/requests/search",
 		input,
 		&response,
 	); err != nil {
