@@ -1,0 +1,73 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: mcp-server-development
+  namespace: 534053084464
+  selfLink: /apis/serving.knative.dev/v1/namespaces/534053084464/services/mcp-server-development
+  uid: 88b5a0a8-b80d-4be8-a7a9-ecdc536f12a3
+  resourceVersion: AAZbEAHJj3Q
+  generation: 7
+  creationTimestamp: "2026-09-09T14:29:38.963637Z"
+  labels:
+    run.googleapis.com/satisfiesPzs: "true"
+    cloud.googleapis.com/location: us-east4
+  annotations:
+    serving.knative.dev/creator: tariqventura@gmail.com
+    serving.knative.dev/lastModifier: tariqventura@gmail.com
+    run.googleapis.com/client-name: cloud-console
+    run.googleapis.com/ingress: internal-and-cloud-load-balancing
+    run.googleapis.com/operation-id: e601c12f-6291-40ed-93de-1a76dc8d6984
+    run.googleapis.com/ingress-status: internal-and-cloud-load-balancing
+    run.googleapis.com/invoker-iam-disabled: "true"
+    run.googleapis.com/maxScale: 3
+    run.googleapis.com/urls: "[\"https://mcp-server-development-534053084464.us-east4.run.app\"\
+      ,\"https://mcp-server-development-4tqk6nxafq-uk.a.run.app\"]"
+spec:
+  template:
+    metadata:
+      labels:
+        client.knative.dev/nonce: 7b24be0f-366e-427c-8f08-c1286e19d86e
+        run.googleapis.com/startupProbeType: Default
+      annotations:
+        run.googleapis.com/sessionAffinity: "false"
+        run.googleapis.com/vpc-access-egress: all-traffic
+        autoscaling.knative.dev/minScale: 0
+        autoscaling.knative.dev/maxScale: 3
+        run.googleapis.com/network-interfaces: "[{\"network\":\"entropy-vpc-development\"\
+          ,\"subnetwork\":\"entropy-subnet-development-01\"}]"
+        run.googleapis.com/client-name: cloud-console
+        run.googleapis.com/cpu-throttling: "true"
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: fleet-service@minecraft-server-501415.iam.gserviceaccount.com
+      containers:
+      - name: mcp-server-1
+        image: us-east4-docker.pkg.dev/minecraft-server-501415/development/mcp-server@sha256:dd707cc736acc9381b95cdcc1fb7afc0ff02d2b21b47ca39f27ce34ff3f4ded8
+        ports:
+        - name: http1
+          containerPort: 3002
+        env:
+        - name: LOGISTIC_SERVICE_URL
+          value: https://logistic-service-development-534053084464.us-east4.run.app
+        - name: LOGISTIC_SERVICE_AUDIENCE
+          value: https://logistic-service-development-534053084464.us-east4.run.app
+        - name: MCP_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: mcp-apikey-development
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 128Mi
+        startupProbe:
+          timeoutSeconds: 240
+          periodSeconds: 240
+          failureThreshold: 1
+          tcpSocket:
+            port: 3002
+  traffic:
+  - percent: 100
+    latestRevision: true
