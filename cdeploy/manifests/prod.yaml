@@ -1,0 +1,54 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: mcp-server-production
+  labels:
+    run.googleapis.com/satisfiesPzs: "true"
+    cloud.googleapis.com/location: us-east4
+  annotations:
+    run.googleapis.com/ingress: internal-and-cloud-load-balancing
+    run.googleapis.com/invoker-iam-disabled: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        run.googleapis.com/startupProbeType: Default
+      annotations:
+        run.googleapis.com/vpc-access-egress: all-traffic
+        run.googleapis.com/network-interfaces: "[{\"network\":\"entropy-vpc-development\"\
+          ,\"subnetwork\":\"entropy-subnet-development-01\"}]"
+        run.googleapis.com/client-name: cloud-console
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: fleet-service@minecraft-server-501415.iam.gserviceaccount.com
+      containers:
+      - name: mcp-server-1
+        image: container-image-prod
+        ports:
+        - name: http1
+          containerPort: 3002
+        env:
+        - name: LOGISTIC_SERVICE_URL
+          value: https://logistic-service-production-534053084464.us-east4.run.app
+        - name: LOGISTIC_SERVICE_AUDIENCE
+          value: https://logistic-service-production-534053084464.us-east4.run.app
+        - name: MCP_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: mcp-apikey-production
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 128Mi
+        startupProbe:
+          timeoutSeconds: 240
+          periodSeconds: 240
+          failureThreshold: 1
+          tcpSocket:
+            port: 3002
+  traffic:
+  - percent: 100
+    latestRevision: true
