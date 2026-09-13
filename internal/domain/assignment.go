@@ -1,24 +1,48 @@
 package domain
 
-type CreateAssignmentInput struct {
-	EquipmentID string `json:"equipmentId"`
-	Reason      string `json:"reason"`
+type StatusTransition struct {
+	ID         string `json:"id"`
+	RequestID  string `json:"requestId"`
+	FromStatus string `json:"fromStatus"`
+	ToStatus   string `json:"toStatus"`
+	Reason     string `json:"reason"`
+	ChangedAt  string `json:"changedAt"`
 }
-
-type UpdateAssignmentStatusInput struct {
-	Status string `json:"status"`
-	Reason string `json:"reason"`
+type PrismaAssignment struct {
+	Request    Request          `json:"request"`
+	Equipment  Machinery        `json:"equipment"`
+	Transition StatusTransition `json:"transition"`
 }
-
-type Assignment struct {
-	ID           string  `json:"id"`
-	RequestID    string  `json:"requestId"`
-	EquipmentID  string  `json:"equipmentId"`
-	Status       string  `json:"status"`
-	StatusReason string  `json:"statusReason"`
-	AssignedAt   string  `json:"assignedAt"`
-	CompletedAt  *string `json:"completedAt,omitempty"`
-	CancelledAt  *string `json:"cancelledAt,omitempty"`
-	CreatedAt    string  `json:"createdAt"`
-	UpdatedAt    string  `json:"updatedAt"`
+type UnifiedAssignment struct {
+	Request     Request          `json:"request"`
+	Equipment   UnifiedEquipment `json:"equipment"`
+	Task        Task             `json:"task"`
+	Compensated bool             `json:"compensated"`
+}
+type UnifiedAssignmentStatus struct {
+	Request   Request          `json:"request"`
+	Equipment UnifiedEquipment `json:"equipment"`
+	Task      Task             `json:"task"`
+}
+type RecommendationScore struct {
+	Total       float64 `json:"total"`
+	Semantic    float64 `json:"semantic"`
+	Maintenance float64 `json:"maintenance"`
+	Operational float64 `json:"operational"`
+}
+type Recommendation struct {
+	Rank        int                 `json:"rank"`
+	Score       RecommendationScore `json:"score"`
+	Equipment   UnifiedEquipment    `json:"equipment"`
+	Maintenance MaintenanceSummary  `json:"maintenance"`
+	Reasons     []string            `json:"reasons"`
+	Warnings    []string            `json:"warnings,omitempty"`
+}
+type Recommendations struct {
+	RequestID         string           `json:"requestId"`
+	AlgorithmVersion  string           `json:"algorithmVersion"`
+	EmbeddingProvider string           `json:"embeddingProvider"`
+	EmbeddingModel    string           `json:"embeddingModel"`
+	Count             int              `json:"count"`
+	Recommendations   []Recommendation `json:"recommendations"`
 }

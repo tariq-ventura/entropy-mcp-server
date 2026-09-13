@@ -7,36 +7,21 @@ import (
 	"strings"
 )
 
-func decodeAPIError(response *http.Response) error {
-	body, readError := io.ReadAll(
-		io.LimitReader(response.Body, 64*1024),
-	)
+func decodeAPIError(serviceName string, response *http.Response) error {
+	body, readError := io.ReadAll(io.LimitReader(response.Body, 64*1024))
 	if readError != nil {
-		return &APIError{
-			StatusCode: response.StatusCode,
-			Code:       "upstream_error",
-			Message:    "could not read logistic-service response",
-		}
+		return &APIError{ServiceName: serviceName, StatusCode: response.StatusCode, Code: "upstream_error", Message: "could not read " + serviceName + " response"}
 	}
-
-	var apiError APIError
-
-	if err := json.Unmarshal(body, &apiError); err != nil {
-		apiError.Code = "upstream_error"
-		apiError.Message = strings.TrimSpace(string(body))
+	var payload APIErrorResponse
+	if err := json.Unmarshal(body, &payload); err != nil {
+		payload.Error = "upstream_error"
+		payload.Message = strings.TrimSpace(string(body))
 	}
-
-	if apiError.Code == "" {
-		apiError.Code = "upstream_error"
+	if payload.Error == "" {
+		payload.Error = "upstream_error"
 	}
-
-	if apiError.Message == "" {
-		apiError.Message = http.StatusText(response.StatusCode)
+	if payload.Message == "" {
+		payload.Message = http.StatusText(response.StatusCode)
 	}
-
-	return &APIError{
-		StatusCode: response.StatusCode,
-		Code:       apiError.Code,
-		Message:    apiError.Message,
-	}
+	return &APIError{ServiceName: serviceName, StatusCode: response.StatusCode, Code: payload.Error, Message: payload.Message}
 }
